@@ -9,6 +9,7 @@ This project represents a fully containerized MERN stack application (Bloglist) 
 - **Database:** MongoDB (official container image with persistent volume)
 - **Reverse Proxy:** Nginx (routes client requests, handles `/api/` proxying to the backend, and serves the frontend)
 - **Orchestration:** Docker Compose (`docker-compose.yml` for production, `docker-compose.dev.yml` for development)
+- **CI/CD & Testing:** GitHub Actions pipelines and automated E2E test suites.
 
 ---
 
@@ -16,12 +17,16 @@ This project represents a fully containerized MERN stack application (Bloglist) 
 
 ```text
 my-app/
+├── .github/
+│   └── workflows/
+│       └── e2e-tests.yml    # CI/CD Pipeline for testing and building
 ├── frontend/
 │   ├── Dockerfile          # Production (Multi-stage + Nginx build)
 │   └── dev.Dockerfile      # Local Development environment
 ├── backend/
 │   ├── Dockerfile          # Production (Multi-stage + automated tests )
 │   └── dev.Dockerfile      # Local Development environment
+├── e2e_tests_by_playwright/   # End-to-end testing suite
 ├── nginx.conf              # Production Reverse Proxy config
 ├── nginx.dev.conf          # Development Reverse Proxy config
 ├── docker-compose.yml      # Production Orchestration
