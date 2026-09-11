@@ -33,8 +33,8 @@ jobs:
 
       - name: Wait for Services
         run: |
-          timeout 120 bash -c 'until curl -s http://localhost:8080 > /dev/null; do sleep 2; done'
-          timeout 120 bash -c 'until curl -s http://localhost:8080/api/blogs > /dev/null; do sleep 2; done'
+          timeout 120 bash -c 'until curl -s -f http://localhost:8080 > /dev/null; do sleep 2; done'
+          timeout 120 bash -c 'until curl -s -f http://localhost:8080/api/blogs > /dev/null; do sleep 2; done'
 
       - name: Install & Run Playwright E2E Tests
         working-directory: ./e2e_tests_by_plawright
