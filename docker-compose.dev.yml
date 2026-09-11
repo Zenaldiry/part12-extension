@@ -1,0 +1,46 @@
+services:
+  mongo:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: bloglist
+    volumes:
+      - mongo_data:/data/db
+  backend:
+    image: backend
+    volumes:
+      - ./bloglist-backend:/usr/src/app
+    environment:
+      MONGODB_URI: mongodb://root:example@mongo:27017/bloglist?authSource=admin
+      TEST_MONGODB_URI: mongodb://root:example@mongo:27017/bloglistTest?authSource=admin
+      SECRET: NEWSECRET
+      PORT: 3000
+    build:
+      context: ./bloglist-backend
+      dockerfile: dev.Dockerfile
+    container_name: backend
+    depends_on:
+      - mongo
+  frontend:
+    image: frontend
+    volumes:
+      - ./bloglist-frontend:/usr/src/app
+    build:
+      context: ./bloglist-frontend
+      dockerfile: dev.Dockerfile
+    container_name: frontend
+    depends_on:
+      - backend
+  nginx:
+    image: nginx:1.29
+    volumes:
+      - ./nginx.dev.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - 8080:80
+    container_name: reverse-proxy-bloglist
+    depends_on:
+      - frontend
+      - backend
+volumes:
+  mongo_data:
