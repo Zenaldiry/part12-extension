@@ -18,6 +18,16 @@ jobs:
         with:
           node-version: '24'
 
+      - name: Install Backend dependencies
+        run: |
+          cd bloglist-backend
+          npm install
+
+      - name: Install Frontend dependencies
+        run: |
+          cd bloglist-frontend
+          npm install
+
       - name: Start Test Environment with Docker Compose
         run: NODE_ENV=test docker compose -f docker-compose.dev.yml up --build -d
 
