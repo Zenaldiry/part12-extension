@@ -12,7 +12,7 @@ services:
     volumes:
       - ./bloglist-backend:/usr/src/app
     environment:
-      NODE_ENV: ${NODE_ENV:-development}
+      # NODE_ENV: ${NODE_ENV:-development}
       MONGODB_URI: mongodb://root:example@mongo:27017/bloglist?authSource=admin
       TEST_MONGODB_URI: mongodb://root:example@mongo:27017/bloglistTest?authSource=admin
       SECRET: NEWSECRET
