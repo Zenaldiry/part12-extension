@@ -41,7 +41,7 @@ jobs:
         run: |
           npm ci
           npx playwright install --with-deps chromium
-          npm run test
+          npx playwright test --reporter=list
 
       - name: Upload Playwright report
         if: failure()
