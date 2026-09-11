@@ -1,0 +1,61 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, master]
+
+jobs:
+  build-test-prod:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Start Test Environment with Docker Compose
+        run: NODE_ENV=test docker compose -f docker-compose.dev.yml up --build -d
+
+      - name: Wait for Services
+        run: |
+          timeout 120 bash -c 'until curl -s http://localhost:8080 > /dev/null; do sleep 2; done'
+          timeout 120 bash -c 'until curl -s http://localhost:8080/api/blogs > /dev/null; do sleep 2; done'
+
+      - name: Install & Run Playwright E2E Tests
+        working-directory: ./e2e_tests_by_plawright
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          npm run test
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: e2e_tests_by_plawright/playwright-report/
+          retention-days: 7
+
+      - name: Show container logs on failure
+        if: failure()
+        run: |
+          echo "=== Backend logs ==="
+          docker compose -f docker-compose.dev.yml logs backend
+          echo "=== Frontend logs ==="
+          docker compose -f docker-compose.dev.yml logs frontend
+      - name: Clean up Test Environment
+        if: always()
+        run: docker compose -f docker-compose.dev.yml down -v
+
+      - name: Start Production Environment
+        if: success()
+        run: docker compose -f docker-compose.yml up --build -d
+
+      - name: Verify Production Containers
+        if: success()
+        run: docker ps
